@@ -4,51 +4,67 @@ import websockets
 import os
 import wave
 import pyaudio
+import keyboard
 from dotenv import load_dotenv
+import time
 
-# 📥 Load environment
+# 📥 Load .env variables
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# 🎙️ Audio recording settings
-CHUNK = 1024
-RATE = 44100
-RECORD_SECONDS = 7
 DEVICE_INDEX = int(os.getenv("DEVICE_INDEX", 0))
 
-def record_audio(filename="temp.wav"):
+# 🎙️ Audio settings
+CHUNK = 1024
+RATE = 44100
+CHANNELS = 1
+FORMAT = pyaudio.paInt16
+
+def record_until_space(filename="temp.wav"):
+    print("🎤 Press [Space] to start recording, [Space] again to stop, [X] to exit.")
+    while not keyboard.is_pressed("space"):
+        if keyboard.is_pressed("x"):
+            raise KeyboardInterrupt
+        time.sleep(0.05)
+
     audio = pyaudio.PyAudio()
-    stream = audio.open(format=pyaudio.paInt16,
-                        channels=1,
-                        rate=RATE,
-                        input=True,
+    stream = audio.open(format=FORMAT, channels=CHANNELS,
+                        rate=RATE, input=True,
                         input_device_index=DEVICE_INDEX,
                         frames_per_buffer=CHUNK)
-    print("🎙️ Recording...")
-    frames = [stream.read(CHUNK) for _ in range(0, int(RATE / CHUNK * RECORD_SECONDS))]
-    print("🛑 Done.")
+    print("⏺️ Recording... Press [Space] to stop.")
+
+    frames = []
+    while True:
+        data = stream.read(CHUNK)
+        frames.append(data)
+        if keyboard.is_pressed("space"):
+            print("🛑 Stopped recording.")
+            break
+        if keyboard.is_pressed("x"):
+            raise KeyboardInterrupt
+
     stream.stop_stream()
     stream.close()
     audio.terminate()
 
     with wave.open(filename, 'wb') as wf:
-        wf.setnchannels(1)
-        wf.setsampwidth(2)
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(audio.get_sample_size(FORMAT))
         wf.setframerate(RATE)
         wf.writeframes(b''.join(frames))
 
     return filename
 
 def transcribe_via_openai(file_path):
-    print("📤 Uploading to Whisper API...")
+    print("🧠 Transcribing via Whisper...")
     with open(file_path, "rb") as audio_file:
-        transcript = openai.Audio.transcribe("whisper-1", audio_file)
+        transcript = openai.Audio.transcribe("whisper-1", audio_file, language="ru")
         return transcript["text"]
 
 def gpt_suggest(text):
-    print(f"📤 Sending to GPT: {text}")
+    print(f"🧠 GPT анализ: {text}")
     messages = [
-        {"role": "system", "content": "You are an AI assistant helping the user pass a job interview. Give a clear and short bullet-pointed answer suggestion. Отвечай только на русском языке"},
+        {"role": "system", "content": "Ты ИИ-помощник, помогаешь пройти собеседование. Отвечай кратко, чётко, по делу. Только на русском языке, в виде пунктов."},
         {"role": "user", "content": text}
     ]
     response = openai.ChatCompletion.create(
@@ -68,24 +84,21 @@ async def send_to_overlay(text):
         print(f"❌ Overlay send error: {e}")
 
 async def main():
+    print("🎧 Готово. Жду нажатия клавиш...")
     try:
         while True:
-            try:
-                filename = record_audio()
-                text = transcribe_via_openai(filename)
+            filename = record_until_space()
+            text = transcribe_via_openai(filename)
 
-                if len(text.strip()) > 5:
-                    print(f"⚠️ Text: {text}")
-                    answer = gpt_suggest(text)
-                    await send_to_overlay(answer)
-                else:
-                    print("⚠️ Too little input, skipping...")
-
-            except Exception as e:
-                print(f"⚠️ Error: {e}")
+            if len(text.strip()) > 5:
+                print(f"📄 Распознанный текст: {text}")
+                answer = gpt_suggest(text)
+                await send_to_overlay(answer)
+            else:
+                print("⚠️ Слишком мало текста, пропуск...")
 
     except KeyboardInterrupt:
-        print("👋 Stopped.")
+        print("👋 Выход.")
 
 if __name__ == "__main__":
     asyncio.run(main())
