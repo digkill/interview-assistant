@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="88df3078-72bc-4728-86b7-15e977c7c13e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/record_audio.py" afterDir="false" />
+    <list default="true" id="88df3078-72bc-4728-86b7-15e977c7c13e" name="Changes" comment="From">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/check_device.py" beforeDir="false" afterPath="$PROJECT_DIR$/check_device.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/listener.py" beforeDir="false" afterPath="$PROJECT_DIR$/listener.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/overlay_server_with_gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/overlay_server_with_gui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -71,11 +68,24 @@
       <option name="presentableId" value="Default" />
       <updated>1752612787198</updated>
       <workItem from="1752612788353" duration="9869000" />
-      <workItem from="1752666590103" duration="1936000" />
+      <workItem from="1752666590103" duration="3291000" />
     </task>
+    <task id="LOCAL-00001" summary="From">
+      <option name="closed" value="true" />
+      <created>1752668650867</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1752668650867</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="From" />
+    <option name="LAST_COMMIT_MESSAGE" value="From" />
   </component>
 </project>

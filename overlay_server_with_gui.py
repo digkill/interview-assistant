@@ -13,7 +13,7 @@ class TransparentOverlay:
         self.root.title("Overlay Server")
         self.root.attributes("-topmost", True)
         self.root.overrideredirect(True)
-        self.root.geometry("600x400+400+400")
+        self.root.geometry("600x600+600+600")
         self.root.configure(bg='black')
         self.root.wm_attributes("-alpha", 0.85)
 
